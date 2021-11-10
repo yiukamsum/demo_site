@@ -38,9 +38,8 @@ class MemberController extends Controller
         }
         if(User::where("member_id",Auth::user()->member_id)->update(["icon_path"=>$path]) ) {
             return 'success';
-        }else {
-            return 'Change Icon Failed';
         }
+        return 'Change Icon Failed';
     }
 
     function getIcon(Request $request){
@@ -60,13 +59,12 @@ class MemberController extends Controller
         if(Hash::check($data['c_password'],Auth::user()->password)){
             User::where("member_id",Auth::user()->member_id)->update(['password'=>Hash::make($data['new_password'])]);
             $message['title'] = "Password Set";
-            $message['content'] = "Your Password was Setted at ".Carbon::now()->toDateTimeString();
+            $message['content'] = "Your Password was set at ".Carbon::now()->toDateTimeString();
             $notify = new Notify;
             $notify->add(Auth::user(),$message,0);
             return "success";
-        }else{
-            return 'Current Password is not correct!';
         }
+        return 'Current Password is not correct!';
     }
 
     function basicSetting(){
@@ -78,6 +76,8 @@ class MemberController extends Controller
         $data['payment'] = Payment::getUserPaymentHistory(Auth::user()->member_id);
 
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        $data['card'] = [];
         if(Auth::user()->email != null){
             if (Auth::user()->stripe_id == null) {
                 $customer = $stripe->customers->create([
@@ -94,9 +94,26 @@ class MemberController extends Controller
                     'type' => 'card',
                 ])->data;
             }
-        }else{
-            $data['card'] = [];
         }
+        // if(Auth::user()->email != null){
+        //     if (Auth::user()->stripe_id == null) {
+        //         $customer = $stripe->customers->create([
+        //             'email' => Auth::user()->email
+        //         ]);
+        //         User::where('member_id', Auth::user()->member_id)->update(['stripe_id' => $customer['id']]);
+        //         $data['card'] = $stripe->paymentMethods->all([
+        //             'customer' => $customer['id'],
+        //             'type' => 'card',
+        //         ])->data;
+        //     }else{
+        //         $data['card'] = $stripe->paymentMethods->all([
+        //             'customer' => Auth::user()->stripe_id,
+        //             'type' => 'card',
+        //         ])->data;
+        //     }
+        // }else{
+        //     $data['card'] = [];
+        // }
         return view('page.setting.basic_info_billing_info',$data);
     }
 
@@ -131,7 +148,8 @@ class MemberController extends Controller
 
         if(User::where('member_id',Auth::user()->member_id)->update($data)){
             if($input['action']=="name"){
-                NameHistory::insert(['member_id'=>Auth::user()->member_id,'unlock_date'=>Carbon::now()->addDay()]);
+                Auth::user()->name_histories()->create(['unlock_date'=>Carbon::now()->addDay()]);
+                // NameHistory::insert(['member_id'=>Auth::user()->member_id]);
             }
             if($input['action']=="email"){
                 $message['title'] = "Email account Update";
@@ -140,8 +158,7 @@ class MemberController extends Controller
                 $notify->add(Auth::user(),$message,0);
             }
             return "success";
-        }else{
-            return "Data Edit failed";
         }
+        return "Data Edit failed";
     }
 }

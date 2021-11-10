@@ -119,7 +119,7 @@ class RentController extends Controller
         $input['location']  = str_replace('width=', '' ,$input['location'] );
 
         foreach ([1,2,3,4] as $k) {
-            // why use $$ ?? its not necessary
+            // why use $$ ?? its not necessary.
             $tmp_name = "photo".$k;
             $$tmp_name = $request->file($tmp_name.'_file');
 

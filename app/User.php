@@ -44,6 +44,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function company_detail()
+    {
+        // Depends on how many company details does a user have
+        // return $this->hasMany(CompanyDetail::class);
+        return $this->hasOne(CompanyDetail::class);
+    }
+
+    public function name_histories()
+    {
+        // Depends on how many company details does a user have
+        // return $this->hasMany(CompanyDetail::class);
+        return $this->hasMany(CompanyDetail::class);
+    }
+
     static function getUserCompanyDetail($member_id)
     {
         return User::leftJoin('company_detail','company_detail.member_id','=','member.member_id')

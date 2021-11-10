@@ -22,6 +22,7 @@ class StripeController extends Controller
     }
 
     function create_subscription(Request $request){
+        // if(!Auth::check())return redirect()->route('login');
         if(Auth::check()){
             $input = $request->all();
 
@@ -30,6 +31,7 @@ class StripeController extends Controller
                     'email' => Auth::user()->email
                 ]);
                User::where('member_id', Auth::user()->member_id)->update(['stripe_id' => $customer['id']]);
+               //Auth::user()->update(['stripe_id' => $customer['id']]);
             }
 
             $data = [
@@ -65,6 +67,7 @@ class StripeController extends Controller
     }
 
     function create_invoice(Request $request){
+        // if(!Auth::check())return redirect()->route('login');
         if(Auth::check()){
             $input = $request->all();
 
@@ -73,6 +76,7 @@ class StripeController extends Controller
                     'email' => Auth::user()->email
                 ]);
                User::where('member_id', Auth::user()->member_id)->update(['stripe_id' => $customer['id']]);
+               // Auth::user()->update(['stripe_id' => $customer['id']]);
             }
 
             $plan = Plan::where('stripe_price_id',$input['price_id'])->first();
@@ -270,6 +274,7 @@ class StripeController extends Controller
     }
 
     function delete_card(Request $request){
+        // if(!Auth::check())return redirect()->route('login');
         if(Auth::check()){
             $input = $request->all();
             $this->stripe->paymentMethods->detach(
@@ -284,6 +289,7 @@ class StripeController extends Controller
     }
 
     function check_coupon(Request $request){
+        // if(!Auth::check())return redirect()->route('login');
         if(Auth::check()){
             $input = $request->all();
             if(Coupon::where('code', $input['coupon'])->count()!=0){

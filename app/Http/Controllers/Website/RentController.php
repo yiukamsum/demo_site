@@ -119,8 +119,10 @@ class RentController extends Controller
         $input['location']  = str_replace('width=', '' ,$input['location'] );
 
         foreach ([1,2,3,4] as $k) {
+            // why use $$ ?? its not necessary.
             $tmp_name = "photo".$k;
             $$tmp_name = $request->file($tmp_name.'_file');
+
             $path = $$tmp_name->storeAs('public/rent/'.Auth::user()->member_id.'/photo'.$k, (Auth::user()->member_id.'_'.Carbon::now()->format('YmdHis').'_'.$$tmp_name->getClientOriginalName()));
             $input[$tmp_name] = $path;
             unset($input[$tmp_name.'_file']);

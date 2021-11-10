@@ -18,6 +18,8 @@ class NotificationController extends Controller
     function getNotification(){
         $user = User::find(Auth::user()->member_id);
         $user->notify(new RealTimeNotification(Auth::user()));
+        // User find should be useless in this case? 
+        // Auth::user()->notify(new RealTimeNotification(Auth::user()))
     }
 
     function notificationSetting(){
@@ -29,19 +31,15 @@ class NotificationController extends Controller
         $id = $request->id;
         if (Notify::where('id',$id)->update(["read_datetime"=>Carbon::now()])) {
             return "success";
-        }else{
-            return "Read notification failed";
         }
+        return "Read notification failed";
     }
 
     function deleteNotification(Request $request){
         $id = $request->id;
         if (Notify::where('id',$id)->update(["deleted"=>1])) {
             return "success";
-        }else{
-            return "Deleted notification failed";
         }
+        return "Deleted notification failed";
     }
-
-
 }
